@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pokémon Pokédex</title>
+    <link rel="stylesheet" href="style.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=arrow_forward,eco,explore,favorite_border,keyboard_arrow_down,light_mode,local_fire_department,menu,person,radio_button_checked,search,settings,sort,star,water_drop"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+
+  <body>
+    <div class="wrapper">
+
+      <header class="header">
+        <button class="icon-btn" id="menu-btn">
+          <span class="material-symbols-outlined">menu</span>
+        </button>
+        <div class="logo">
+          <img
+            src="https://upload.wikimedia.org/wikipedia/commons/9/98/International_Pok%C3%A9mon_logo.svg"
+            alt="Pokemon Logo"
+          />
+        </div>
+        <button class="icon-btn" id="theme-btn">
+          <span class="material-symbols-outlined">light_mode</span>
+        </button>
+      </header>
+
+      <div class="toolbar">
+        <div class="search">
+          <span class="material-symbols-outlined search-icon">search</span>
+          <input type="text" placeholder="Search for a Pokémon..." />
+        </div>
+        <div class="filters">
+          <button class="filter-btn">
+            Filter by types (1)
+            <span class="material-symbols-outlined">keyboard_arrow_down</span>
+          </button>
+          <button class="sort-btn">
+            <span class="material-symbols-outlined">sort</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="grid">
+
+        <div class="card grass">
+          <div class="card-top">
+            <span class="number">#0908</span>
+            <button class="fav-btn">
+              <span class="material-symbols-outlined">favorite_border</span>
+            </button>
+          </div>
+          <div class="type-icon">
+            <span class="material-symbols-outlined" style="color: #4caf50;">eco</span>
+          </div>
+          <div class="card-img">
+            <img
+              src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/908.png"
+              alt="Meowscarada"
+            />
+          </div>
+          <div class="card-info">
+            <h3 class="name">Meowscarada</h3>
+            <div class="card-footer">
+              <span class="badge grass-badge">
+                <span class="material-symbols-outlined">eco</span> GRASS
+              </span>
+              <button class="go-btn">
+                <span class="material-symbols-outlined">arrow_forward</span>
+              </button>
+            </div>
+          </div>
+          <div class="color-bar grass-bar"></div>
+        </div>
+
+        <div class="card dark">
+          <div class="card-top">
+            <span class="number">#0624</span>
+            <button class="fav-btn">
+              <span class="material-symbols-outlined">favorite_border</span>
+            </button>
+          </div>
+          <div class="type-icon">
+            <span class="material-symbols-outlined" style="color: #78909c;">settings</span>
+          </div>
+          <div class="card-img">
+            <img
+              src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/624.png"
+              alt="Pawniard"
+            />
+          </div>
+          <div class="card-info">
+            <h3 class="name">Pawniard</h3>
+            <div class="card-footer">
+              <span class="badge dark-badge">
+                <span class="material-symbols-outlined">settings</span> DARK / STEEL
+              </span>
+              <button class="go-btn">
+                <span class="material-symbols-outlined">arrow_forward</span>
+              </button>
+            </div>
+          </div>
+          <div class="color-bar dark-bar"></div>
+        </div>
+
+        <div class="card fire">
+          <div class="card-top">
+            <span class="number">#0229</span>
+            <button class="fav-btn">
+              <span class="material-symbols-outlined">favorite_border</span>
+            </button>
+          </div>
+          <div class="type-icon">
+            <span class="material-symbols-outlined" style="color: #f44336;">local_fire_department</span>
+          </div>
+          <div class="card-img">
+            <img
+              src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/229.png"
+              alt="Houndoom"
+            />
+          </div>
+          <div class="card-info">
+            <h3 class="name">Houndoom</h3>
+            <div class="card-footer">
+              <span class="badge fire-badge">
+                <span class="material-symbols-outlined">local_fire_department</span> DARK / FIRE
+              </span>
+              <button class="go-btn">
+                <span class="material-symbols-outlined">arrow_forward</span>
+              </button>
+            </div>
+          </div>
+          <div class="color-bar fire-bar"></div>
+        </div>
+
+        <div class="card psychic">
+          <div class="card-top">
+            <span class="number">#0686</span>
+            <button class="fav-btn">
+              <span class="material-symbols-outlined">favorite_border</span>
+            </button>
+          </div>
+          <div class="type-icon">
+            <span class="material-symbols-outlined" style="color: #2196f3;">water_drop</span>
+          </div>
+          <div class="card-img">
+            <img
+              src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/686.png"
+              alt="Inkay"
+            />
+          </div>
+          <div class="card-info">
+            <h3 class="name">Inkay</h3>
+            <div class="card-footer">
+              <span class="badge psychic-badge">
+                <span class="material-symbols-outlined">water_drop</span> DARK / PSYCHIC
+              </span>
+              <button class="go-btn">
+                <span class="material-symbols-outlined">arrow_forward</span>
+              </button>
+            </div>
+          </div>
+          <div class="color-bar psychic-bar"></div>
+        </div>
+
+      </div>
+
+      <div class="features">
+
+        <div class="feature">
+          <div class="feature-icon explore-icon">
+            <span class="material-symbols-outlined">explore</span>
+          </div>
+          <div class="feature-text">
+            <h4>Explore</h4>
+            <p>Discover all your favorite Pokémon</p>
+          </div>
+        </div>
+
+        <div class="feature">
+          <div class="feature-icon filter-icon">
+            <span class="material-symbols-outlined">eco</span>
+          </div>
+          <div class="feature-text">
+            <h4>Filter</h4>
+            <p>Find Pokémon by types and abilities</p>
+          </div>
+        </div>
+
+        <div class="feature">
+          <div class="feature-icon collection-icon">
+            <span class="material-symbols-outlined">star</span>
+          </div>
+          <div class="feature-text">
+            <h4>Collection</h4>
+            <p>Save and manage your collection</p>
+          </div>
+        </div>
+
+        <div class="feature">
+          <div class="feature-icon stats-icon">
+            <span class="material-symbols-outlined">person</span>
+          </div>
+          <div class="feature-text">
+            <h4>Stats</h4>
+            <p>View stats and learn about Pokémon</p>
+          </div>
+        </div>
+
+      </div>
+
+      <footer class="footer">
+        <div class="footer-icon">
+          <span class="material-symbols-outlined">radio_button_checked</span>
+        </div>
+        <p>© 2026 Pokémon. All rights reserved. Made By Sayed Risat</p>
+      </footer>
+
+    </div>
+  </body>
+</html>
