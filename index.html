@@ -1,34 +1,61 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>My Assignments</title>
-
-  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Assignments</title>
+  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@700;800&display=swap" rel="stylesheet" />
 </head>
-
 <body>
 
-  <div class="container">
+  <div class="bg-grid"></div>
 
-    <h1>✨ My Assignments ✨</h1>
+  <header>
+    <div class="header-inner">
+      <div class="badge">Portfolio</div>
+      <h1>Assignments</h1>
+      <p class="subtitle">A collection of coursework & submitted work</p>
+    </div>
+  </header>
 
-    <div class="cards">
-
-      <a class="card" href="./assignment-1/">
-        <h2>Assignment 1</h2>
-        <p>CSS Practice</p>
-      </a>
-
-      <a class="card" href="./assignment-2/">
-        <h2>Assignment 2</h2>
-        <p>CSS Practice</p>
-      </a>
-
+  <main>
+    <div class="grid" id="assignments">
+      <!-- ASSIGNMENTS_START -->
+      <!-- ASSIGNMENTS_END -->
     </div>
 
-  </div>
+    <div class="empty-state" id="empty-state" style="display:none;">
+      <span class="empty-icon">📂</span>
+      <p>No assignments yet. Add a folder like <code>assignment-1/</code> and push.</p>
+    </div>
+  </main>
+
+  <footer>
+    <span>Auto-synced with GitHub</span>
+    <span class="dot">·</span>
+    <span id="count">0 assignments</span>
+  </footer>
+
+  <script>
+    // Count cards and show empty state if needed
+    const cards = document.querySelectorAll('.card');
+    const countEl = document.getElementById('count');
+    const emptyEl = document.getElementById('empty-state');
+    const grid = document.getElementById('assignments');
+
+    countEl.textContent = `${cards.length} assignment${cards.length !== 1 ? 's' : ''}`;
+
+    if (cards.length === 0) {
+      grid.style.display = 'none';
+      emptyEl.style.display = 'flex';
+    }
+
+    // Stagger card reveal on load
+    cards.forEach((card, i) => {
+      card.style.animationDelay = `${i * 80}ms`;
+    });
+  </script>
 
 </body>
 </html>
