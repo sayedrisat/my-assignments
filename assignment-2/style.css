@@ -61,7 +61,7 @@ body {
     display: flex;
     align-items: flex-start;
     gap: 30px;
-    margin-top: 65px;
+    margin-top: 35%;
 }
 
 .side-text {
@@ -69,7 +69,7 @@ body {
     transform: rotate(180deg);
     font-family: 'Playfair Display', serif;
     font-style: italic;
-    font-size: 30px;
+    font-size: 50px;
     color: #1a2520;
     white-space: nowrap;
 }
@@ -79,6 +79,9 @@ ul {
     display: flex;
     flex-direction: column;
     width: 100%;
+    margin-top: -30px;
+    margin-left: 30px;
+    gap: 20px;
 }
 
 ul li {
@@ -134,8 +137,8 @@ nav a:hover {
 }
 
 .details {
-    margin-top: 50px;
-    padding-left: 50px;
+    margin-top: 130px;
+    padding-left: 200px;
 }
 
 .details h1 {
@@ -152,6 +155,7 @@ nav a:hover {
     flex-direction: column;
     gap: 10px;
     margin-bottom: 25px;
+    margin-left: 100px;
 }
 
 .meta p {
@@ -229,6 +233,21 @@ button:hover {
 
 .beetle img {
     width: 100%;
+    height: auto;
+    display: block;
+}
+
+#poka {
+    position: absolute;
+    top: 47%;
+    left: 73%;
+    transform: translate(-50%, -48%);
+    z-index: 10;
+    width: 275px;
+}
+
+#poka img {
+    width: 45%;
     height: auto;
     display: block;
 }
