@@ -1,0 +1,73 @@
+name: Sync Assignments
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  update-index:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Scan folders and update index.html
+        run: |
+          python3 - <<'EOF'
+          import os, re
+
+          # Find and sort all assignment-* directories
+          folders = sorted([
+              d for d in os.listdir('.')
+              if os.path.isdir(d) and re.match(r'^assignment-\d+', d)
+          ], key=lambda x: int(re.search(r'\d+', x).group()))
+
+          # Build card HTML for each folder
+          cards = []
+          for folder in folders:
+              num = re.search(r'\d+', folder).group()
+              label = f"Assignment {num}"
+              card = (
+                  f'      <a href="./{folder}/" class="card">\n'
+                  f'        <span class="num">#{num.zfill(2)}</span>\n'
+                  f'        <span class="title">{label}</span>\n'
+                  f'        <span class="arrow">↗</span>\n'
+                  f'      </a>'
+              )
+              cards.append(card)
+
+          cards_html = '\n'.join(cards)
+
+          # Read current index.html
+          with open('index.html', 'r') as f:
+              content = f.read()
+
+          # Replace section between placeholders
+          new_content = re.sub(
+              r'<!-- ASSIGNMENTS_START -->.*?<!-- ASSIGNMENTS_END -->',
+              f'<!-- ASSIGNMENTS_START -->\n{cards_html}\n      <!-- ASSIGNMENTS_END -->',
+              content,
+              flags=re.DOTALL
+          )
+
+          with open('index.html', 'w') as f:
+              f.write(new_content)
+
+          print(f"✅ Updated index.html with {len(folders)} assignment(s): {folders}")
+          EOF
+
+      - name: Commit and push if changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add index.html
+          if git diff --cached --quiet; then
+            echo "No changes to commit."
+          else
+            git commit -m "chore: sync assignments [skip ci]"
+            git push
+          fi
