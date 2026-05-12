@@ -46,6 +46,24 @@ body {
   pointer-events: none;
 }
 
+/* Back link (used on sub-assignment pages) */
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text-secondary);
+  text-decoration: none;
+  letter-spacing: 0.04em;
+  margin-bottom: 28px;
+  transition: color 0.2s;
+}
+
+.back-link:hover {
+  color: var(--accent);
+}
+
 /* Header */
 header {
   position: relative;
