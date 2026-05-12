@@ -15,38 +15,122 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
 
-      - name: Scan folders and update index.html
+      - name: Scan folders and update index files
         run: |
           python3 - <<'EOF'
           import os, re
 
-          # Find and sort all assignment-* directories
-          folders = sorted([
+          # ── helpers ──────────────────────────────────────────────────────────
+
+          def get_sub_assignments(folder):
+              """Return sorted sub-folders inside an assignment that each have an index.html."""
+              subs = []
+              for item in sorted(os.listdir(folder)):
+                  path = os.path.join(folder, item)
+                  if os.path.isdir(path) and os.path.isfile(os.path.join(path, 'index.html')):
+                      subs.append(item)
+              return subs
+
+          def make_sub_index(parent_folder, sub_folders, parent_num):
+              """Auto-generate assignment-N/index.html listing its sub-pages as cards."""
+              cards = []
+              for i, sub in enumerate(sub_folders, 1):
+                  label = re.sub(r'[-_]', ' ', sub).title()
+                  card = (
+                      f'      <a href="./{sub}/" class="card">\n'
+                      f'        <span class="num">#{str(i).zfill(2)}</span>\n'
+                      f'        <span class="title">{label}</span>\n'
+                      f'        <span class="arrow">↗</span>\n'
+                      f'      </a>'
+                  )
+                  cards.append(card)
+
+              cards_html = '\n'.join(cards)
+              count = len(sub_folders)
+
+              return f'''<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Assignment {parent_num}</title>
+  <link rel="stylesheet" href="../style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@700;800&display=swap" rel="stylesheet" />
+</head>
+<body>
+
+  <div class="bg-grid"></div>
+
+  <header>
+    <div class="header-inner">
+      <a href="../" class="back-link">← Back to Assignments</a>
+      <div class="badge">Assignment {parent_num}</div>
+      <h1>Assignment {parent_num}</h1>
+      <p class="subtitle">Select a part to open</p>
+    </div>
+  </header>
+
+  <main>
+    <div class="grid" id="assignments">
+      <!-- SUB_START -->
+{cards_html}
+      <!-- SUB_END -->
+    </div>
+  </main>
+
+  <footer>
+    <span>Auto-synced with GitHub</span>
+    <span class="dot">·</span>
+    <span>{count} part{"s" if count != 1 else ""}</span>
+  </footer>
+
+  <script>
+    const cards = document.querySelectorAll('.card');
+    cards.forEach((card, i) => {{
+      card.style.animationDelay = `${{i * 80}}ms`;
+    }});
+  </script>
+
+</body>
+</html>'''
+
+          # ── main ─────────────────────────────────────────────────────────────
+
+          root_folders = sorted([
               d for d in os.listdir('.')
-              if os.path.isdir(d) and re.match(r'^assignment-\d+', d)
+              if os.path.isdir(d) and re.match(r'^assignment-\d+$', d)
           ], key=lambda x: int(re.search(r'\d+', x).group()))
 
-          # Build card HTML for each folder
-          cards = []
-          for folder in folders:
+          root_cards = []
+          for folder in root_folders:
               num = re.search(r'\d+', folder).group()
-              label = f"Assignment {num}"
+              subs = get_sub_assignments(folder)
+
+              if subs:
+                  sub_html = make_sub_index(folder, subs, num)
+                  sub_index_path = os.path.join(folder, 'index.html')
+                  with open(sub_index_path, 'w') as f:
+                      f.write(sub_html)
+                  print(f"  📄 Generated {sub_index_path}  →  {len(subs)} sub-page(s): {subs}")
+              else:
+                  if not os.path.isfile(os.path.join(folder, 'index.html')):
+                      print(f"  ⚠️  {folder}/ has no index.html and no sub-folders — skipping.")
+                      continue
+
               card = (
                   f'      <a href="./{folder}/" class="card">\n'
                   f'        <span class="num">#{num.zfill(2)}</span>\n'
-                  f'        <span class="title">{label}</span>\n'
+                  f'        <span class="title">Assignment {num}</span>\n'
                   f'        <span class="arrow">↗</span>\n'
                   f'      </a>'
               )
-              cards.append(card)
+              root_cards.append(card)
 
-          cards_html = '\n'.join(cards)
+          cards_html = '\n'.join(root_cards)
 
-          # Read current index.html
           with open('index.html', 'r') as f:
               content = f.read()
 
-          # Replace section between placeholders
           new_content = re.sub(
               r'<!-- ASSIGNMENTS_START -->.*?<!-- ASSIGNMENTS_END -->',
               f'<!-- ASSIGNMENTS_START -->\n{cards_html}\n      <!-- ASSIGNMENTS_END -->',
@@ -57,7 +141,7 @@ jobs:
           with open('index.html', 'w') as f:
               f.write(new_content)
 
-          print(f"✅ Updated index.html with {len(folders)} assignment(s): {folders}")
+          print(f"\n✅ Root index.html updated  →  {len(root_cards)} card(s): {root_folders}")
           EOF
 
       - name: Commit and push if changed
@@ -65,6 +149,7 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add index.html
+          find . -path './.git' -prune -o -name 'index.html' -print | xargs git add
           if git diff --cached --quiet; then
             echo "No changes to commit."
           else
