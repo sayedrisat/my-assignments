@@ -1,0 +1,86 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html,
+body {
+    height: 100%;
+    width: 100%;
+}
+
+main {
+    height: 100%;
+    width: 100%;
+    background-color: black;
+    display: grid;
+    grid-template-columns: 22% 20% 7% 27% 22%;
+    grid-template-rows: 29% 24% 7% 18% 18%;
+    grid-template-areas:
+        "LT TB1 TB1 TB2 RT"
+        "LT C C C RT"
+        "LB C C C RT"
+        "LB C C C RB"
+        "LB BC1 BC2 BC2 RB"
+    ;
+    gap: 5px;
+}
+
+.LT,
+.LB,
+.RT,
+.RB,
+.C,
+.TB1,
+.TB2,
+.BC1,
+.BC2 {
+    border: 2px solid white;
+    border-radius: 25px;
+}
+
+.LT {
+    grid-area: LT;
+    background-color: #ff6b6b;
+}
+
+.LB {
+    grid-area: LB;
+    background-color: #4ecdc4;
+}
+
+.RT {
+    grid-area: RT;
+    background-color: #ffd166;
+}
+
+.RB {
+    grid-area: RB;
+    background-color: #6a4c93;
+}
+
+.C {
+    grid-area: C;
+    background-color: #8ac926;
+}
+
+.TB1 {
+    grid-area: TB1;
+    background-color: #3a86ff;
+}
+
+.TB2 {
+    grid-area: TB2;
+    background-color: #ff9f1c;
+}
+
+.BC1 {
+    grid-area: BC1;
+    background-color: #f15bb5;
+}
+
+.BC2 {
+    grid-area: BC2;
+    background-color: #00bbf9;
+}
