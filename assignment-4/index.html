@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Assignment 04</title>
+  <link rel="stylesheet" href="../style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@700;800&display=swap" rel="stylesheet" />
+</head>
+<body>
+  <div class="bg-grid"></div>
+  <header>
+    <div class="header-inner">
+      <a href="../" class="back-link">← All Assignments</a>
+      <div class="badge">Assignment 04</div>
+      <h1>Assignment 04</h1>
+      <p class="subtitle">Select a part to open</p>
+    </div>
+  </header>
+  <main>
+    <div class="grid" id="assignments">
+      <!-- ASSIGNMENTS_START -->
+      <a href="./assignment4-1/" class="card">
+        <span class="num">Part 1</span>
+        <span class="title">Assignment4 1</span>
+        
+        <span class="arrow">↗</span>
+      </a>
+      <a href="./assignment4-2/" class="card">
+        <span class="num">Part 2</span>
+        <span class="title">Assignment4 2</span>
+        
+        <span class="arrow">↗</span>
+      </a>
+      <a href="./assignment4-3/" class="card">
+        <span class="num">Part 3</span>
+        <span class="title">Assignment4 3</span>
+        
+        <span class="arrow">↗</span>
+      </a>
+      <!-- ASSIGNMENTS_END -->
+    </div>
+  </main>
+  <footer>
+    <span>Auto-synced with GitHub</span>
+    <span class="dot">·</span>
+    <span id="count">0 parts</span>
+  </footer>
+  <script>
+    const cards = document.querySelectorAll('.card');
+    document.getElementById('count').textContent = cards.length + ' part' + (cards.length !== 1 ? 's' : '');
+    cards.forEach((c, i) => c.style.animationDelay = i * 80 + 'ms');
+  </script>
+</body>
+</html>
