@@ -17,139 +17,141 @@ jobs:
 
       - name: Scan folders and update index files
         run: |
-          python3 - <<'EOF'
-          import os, re
+          python3 << 'EOF'
+import os, re
 
-          # ── helpers ──────────────────────────────────────────────────────────
+# ─────────────────────────────────────────
+# HELPERS
+# ─────────────────────────────────────────
 
-          def get_sub_assignments(folder):
-              """Return sorted sub-folders inside an assignment that each have an index.html."""
-              subs = []
-              for item in sorted(os.listdir(folder)):
-                  path = os.path.join(folder, item)
-                  if os.path.isdir(path) and os.path.isfile(os.path.join(path, 'index.html')):
-                      subs.append(item)
-              return subs
+def sort_key(name):
+    nums = re.findall(r'\d+', name)
+    return [int(n) for n in nums]
 
-          def make_sub_index(parent_folder, sub_folders, parent_num):
-              """Auto-generate assignment-N/index.html listing its sub-pages as cards."""
-              cards = []
-              for i, sub in enumerate(sub_folders, 1):
-                  label = re.sub(r'[-_]', ' ', sub).title()
-                  card = (
-                      f'      <a href="./{sub}/" class="card">\n'
-                      f'        <span class="num">#{str(i).zfill(2)}</span>\n'
-                      f'        <span class="title">{label}</span>\n'
-                      f'        <span class="arrow">↗</span>\n'
-                      f'      </a>'
-                  )
-                  cards.append(card)
+def build_card(href, num_label, title, badge=""):
+    return (
+        f'      <a href="./{href}/" class="card">\n'
+        f'        <span class="num">{num_label}</span>\n'
+        f'        <span class="title">{title}</span>\n'
+        f'        {badge}\n'
+        f'        <span class="arrow">↗</span>\n'
+        f'      </a>'
+    )
 
-              cards_html = '\n'.join(cards)
-              count = len(sub_folders)
+def inject_cards(filepath, cards_html):
+    with open(filepath, 'r') as f:
+        content = f.read()
+    if '<!-- ASSIGNMENTS_START -->' not in content:
+        print(f"  ⚠ Skipped {filepath} — no placeholder found")
+        return
+    new_content = re.sub(
+        r'<!-- ASSIGNMENTS_START -->.*?<!-- ASSIGNMENTS_END -->',
+        f'<!-- ASSIGNMENTS_START -->\n{cards_html}\n      <!-- ASSIGNMENTS_END -->',
+        content, flags=re.DOTALL
+    )
+    with open(filepath, 'w') as f:
+        f.write(new_content)
 
-              return f'''<!DOCTYPE html>
+SUB_PAGE_TEMPLATE = """\
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Assignment {parent_num}</title>
+  <title>Assignment {num}</title>
   <link rel="stylesheet" href="../style.css" />
   <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@700;800&display=swap" rel="stylesheet" />
 </head>
 <body>
-
   <div class="bg-grid"></div>
-
   <header>
     <div class="header-inner">
-      <a href="../" class="back-link">← Back to Assignments</a>
-      <div class="badge">Assignment {parent_num}</div>
-      <h1>Assignment {parent_num}</h1>
+      <a href="../" class="back-link">← All Assignments</a>
+      <div class="badge">Assignment {num}</div>
+      <h1>Assignment {num}</h1>
       <p class="subtitle">Select a part to open</p>
     </div>
   </header>
-
   <main>
     <div class="grid" id="assignments">
-      <!-- SUB_START -->
-{cards_html}
-      <!-- SUB_END -->
+      <!-- ASSIGNMENTS_START -->
+      <!-- ASSIGNMENTS_END -->
     </div>
   </main>
-
   <footer>
     <span>Auto-synced with GitHub</span>
     <span class="dot">·</span>
-    <span>{count} part{"s" if count != 1 else ""}</span>
+    <span id="count">0 parts</span>
   </footer>
-
   <script>
     const cards = document.querySelectorAll('.card');
-    cards.forEach((card, i) => {{
-      card.style.animationDelay = `${{i * 80}}ms`;
-    }});
+    document.getElementById('count').textContent = cards.length + ' part' + (cards.length !== 1 ? 's' : '');
+    cards.forEach((c, i) => c.style.animationDelay = i * 80 + 'ms');
   </script>
-
 </body>
-</html>'''
+</html>
+"""
 
-          # ── main ─────────────────────────────────────────────────────────────
+# ─────────────────────────────────────────
+# STEP 1 — Update ROOT index.html
+# Finds all assignment-*/ folders at root
+# ─────────────────────────────────────────
 
-          root_folders = sorted([
-              d for d in os.listdir('.')
-              if os.path.isdir(d) and re.match(r'^assignment-\d+$', d)
-          ], key=lambda x: int(re.search(r'\d+', x).group()))
+root_folders = sorted(
+    [d for d in os.listdir('.') if os.path.isdir(d) and re.match(r'^assignment-\d+', d)],
+    key=sort_key
+)
 
-          root_cards = []
-          for folder in root_folders:
-              num = re.search(r'\d+', folder).group()
-              subs = get_sub_assignments(folder)
+root_cards = []
+for folder in root_folders:
+    num = re.search(r'\d+', folder).group()
+    sub_dirs = [s for s in os.listdir(folder) if os.path.isdir(os.path.join(folder, s))]
+    badge = f'<span class="parts-badge">↓ {len(sub_dirs)} parts</span>' if sub_dirs else ''
+    root_cards.append(build_card(folder, f'#{num.zfill(2)}', f'Assignment {num}', badge))
 
-              if subs:
-                  sub_html = make_sub_index(folder, subs, num)
-                  sub_index_path = os.path.join(folder, 'index.html')
-                  with open(sub_index_path, 'w') as f:
-                      f.write(sub_html)
-                  print(f"  📄 Generated {sub_index_path}  →  {len(subs)} sub-page(s): {subs}")
-              else:
-                  if not os.path.isfile(os.path.join(folder, 'index.html')):
-                      print(f"  ⚠️  {folder}/ has no index.html and no sub-folders — skipping.")
-                      continue
+inject_cards('index.html', '\n'.join(root_cards))
+print(f"✅ Root index.html — {len(root_folders)} assignment(s)")
 
-              card = (
-                  f'      <a href="./{folder}/" class="card">\n'
-                  f'        <span class="num">#{num.zfill(2)}</span>\n'
-                  f'        <span class="title">Assignment {num}</span>\n'
-                  f'        <span class="arrow">↗</span>\n'
-                  f'      </a>'
-              )
-              root_cards.append(card)
+# ─────────────────────────────────────────
+# STEP 2 — For each assignment folder,
+# check for sub-folders and auto-generate
+# or update that assignment's index.html
+# ─────────────────────────────────────────
 
-          cards_html = '\n'.join(root_cards)
+for folder in root_folders:
+    sub_folders = sorted(
+        [s for s in os.listdir(folder) if os.path.isdir(os.path.join(folder, s))],
+        key=sort_key
+    )
 
-          with open('index.html', 'r') as f:
-              content = f.read()
+    if not sub_folders:
+        continue  # Normal assignment, no sub-folders needed
 
-          new_content = re.sub(
-              r'<!-- ASSIGNMENTS_START -->.*?<!-- ASSIGNMENTS_END -->',
-              f'<!-- ASSIGNMENTS_START -->\n{cards_html}\n      <!-- ASSIGNMENTS_END -->',
-              content,
-              flags=re.DOTALL
-          )
+    num = re.search(r'\d+', folder).group()
+    sub_index = os.path.join(folder, 'index.html')
 
-          with open('index.html', 'w') as f:
-              f.write(new_content)
+    # Create the sub-page if it doesn't exist yet
+    if not os.path.exists(sub_index):
+        with open(sub_index, 'w') as f:
+            f.write(SUB_PAGE_TEMPLATE.format(num=num.zfill(2)))
+        print(f"✅ Created {sub_index}")
 
-          print(f"\n✅ Root index.html updated  →  {len(root_cards)} card(s): {root_folders}")
-          EOF
+    # Build cards for each sub-folder
+    sub_cards = []
+    for i, sub in enumerate(sub_folders, 1):
+        label = sub.replace('-', ' ').title()
+        sub_cards.append(build_card(sub, f'Part {i}', label))
+
+    inject_cards(sub_index, '\n'.join(sub_cards))
+    print(f"✅ {sub_index} — {len(sub_folders)} part(s): {sub_folders}")
+
+EOF
 
       - name: Commit and push if changed
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add index.html
-          find . -path './.git' -prune -o -name 'index.html' -print | xargs git add
+          git add -A
           if git diff --cached --quiet; then
             echo "No changes to commit."
           else
