@@ -15,18 +15,13 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
 
-      - name: Scan folders and update index files
+      - name: Write sync script
         run: |
-          python3 << 'EOF'
+          cat > /tmp/sync.py << 'PYEOF'
 import os, re
 
-# ─────────────────────────────────────────
-# HELPERS
-# ─────────────────────────────────────────
-
 def sort_key(name):
-    nums = re.findall(r'\d+', name)
-    return [int(n) for n in nums]
+    return [int(n) for n in re.findall(r'\d+', name)]
 
 def build_card(href, num_label, title, badge=""):
     return (
@@ -42,7 +37,7 @@ def inject_cards(filepath, cards_html):
     with open(filepath, 'r') as f:
         content = f.read()
     if '<!-- ASSIGNMENTS_START -->' not in content:
-        print(f"  ⚠ Skipped {filepath} — no placeholder found")
+        print(f"  WARNING: no placeholder in {filepath}")
         return
     new_content = re.sub(
         r'<!-- ASSIGNMENTS_START -->.*?<!-- ASSIGNMENTS_END -->',
@@ -52,8 +47,7 @@ def inject_cards(filepath, cards_html):
     with open(filepath, 'w') as f:
         f.write(new_content)
 
-SUB_PAGE_TEMPLATE = """\
-<!DOCTYPE html>
+SUB_PAGE_TEMPLATE = """<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -66,7 +60,7 @@ SUB_PAGE_TEMPLATE = """\
   <div class="bg-grid"></div>
   <header>
     <div class="header-inner">
-      <a href="../" class="back-link">← All Assignments</a>
+      <a href="../" class="back-link">back to Assignments</a>
       <div class="badge">Assignment {num}</div>
       <h1>Assignment {num}</h1>
       <p class="subtitle">Select a part to open</p>
@@ -89,63 +83,50 @@ SUB_PAGE_TEMPLATE = """\
     cards.forEach((c, i) => c.style.animationDelay = i * 80 + 'ms');
   </script>
 </body>
-</html>
-"""
-
-# ─────────────────────────────────────────
-# STEP 1 — Update ROOT index.html
-# Finds all assignment-*/ folders at root
-# ─────────────────────────────────────────
+</html>"""
 
 root_folders = sorted(
-    [d for d in os.listdir('.') if os.path.isdir(d) and re.match(r'^assignment-\d+', d)],
+    [d for d in os.listdir('.') if os.path.isdir(d) and re.match(r'^assignment-\d+$', d)],
     key=sort_key
 )
 
 root_cards = []
 for folder in root_folders:
     num = re.search(r'\d+', folder).group()
-    sub_dirs = [s for s in os.listdir(folder) if os.path.isdir(os.path.join(folder, s))]
-    badge = f'<span class="parts-badge">↓ {len(sub_dirs)} parts</span>' if sub_dirs else ''
+    sub_dirs = sorted(
+        [s for s in os.listdir(folder) if os.path.isdir(os.path.join(folder, s))],
+        key=sort_key
+    )
+    badge = f'<span class="parts-badge">+ {len(sub_dirs)} parts</span>' if sub_dirs else ''
     root_cards.append(build_card(folder, f'#{num.zfill(2)}', f'Assignment {num}', badge))
+    print(f"  card: {folder}" + (f" ({len(sub_dirs)} sub-parts)" if sub_dirs else ""))
 
 inject_cards('index.html', '\n'.join(root_cards))
-print(f"✅ Root index.html — {len(root_folders)} assignment(s)")
-
-# ─────────────────────────────────────────
-# STEP 2 — For each assignment folder,
-# check for sub-folders and auto-generate
-# or update that assignment's index.html
-# ─────────────────────────────────────────
+print(f"OK root index.html updated with {len(root_folders)} assignment(s)")
 
 for folder in root_folders:
+    num = re.search(r'\d+', folder).group()
     sub_folders = sorted(
         [s for s in os.listdir(folder) if os.path.isdir(os.path.join(folder, s))],
         key=sort_key
     )
-
     if not sub_folders:
-        continue  # Normal assignment, no sub-folders needed
-
-    num = re.search(r'\d+', folder).group()
+        continue
     sub_index = os.path.join(folder, 'index.html')
-
-    # Create the sub-page if it doesn't exist yet
     if not os.path.exists(sub_index):
         with open(sub_index, 'w') as f:
             f.write(SUB_PAGE_TEMPLATE.format(num=num.zfill(2)))
-        print(f"✅ Created {sub_index}")
-
-    # Build cards for each sub-folder
+        print(f"  created {sub_index}")
     sub_cards = []
     for i, sub in enumerate(sub_folders, 1):
-        label = sub.replace('-', ' ').title()
+        label = re.sub(r'[-_]', ' ', sub).title()
         sub_cards.append(build_card(sub, f'Part {i}', label))
-
     inject_cards(sub_index, '\n'.join(sub_cards))
-    print(f"✅ {sub_index} — {len(sub_folders)} part(s): {sub_folders}")
+    print(f"  OK {sub_index} with {len(sub_folders)} parts")
+PYEOF
 
-EOF
+      - name: Run sync script
+        run: python3 /tmp/sync.py
 
       - name: Commit and push if changed
         run: |
