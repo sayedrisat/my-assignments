@@ -1,7 +1,5 @@
 import os, re
 
-# ── helpers ──────────────────────────────────────────
-
 def sort_key(name):
     return [int(n) for n in re.findall(r'\d+', name)]
 
@@ -14,8 +12,6 @@ def make_card(href, num_label, title, badge=''):
         + '        <span class="arrow">&#8599;</span>\n'
         '      </a>'
     )
-
-# ── templates ─────────────────────────────────────────
 
 ROOT_HTML = '''<!DOCTYPE html>
 <html lang="en">
@@ -100,18 +96,35 @@ SUB_HTML = '''<!DOCTYPE html>
 </body>
 </html>'''
 
+# ── step 0: ensure every assignment folder has index.html ──
+# If missing, create one that redirects to the first .html file found
+
+all_assignment_folders = [d for d in os.listdir('.') if os.path.isdir(d) and re.match(r'^assignment-\d+$', d)]
+
+for folder in all_assignment_folders:
+    index_path = os.path.join(folder, 'index.html')
+    if not os.path.exists(index_path):
+        html_files = [f for f in os.listdir(folder) if f.endswith('.html') and f != 'index.html']
+        if html_files:
+            target = html_files[0]
+            with open(index_path, 'w') as f:
+                f.write('<!DOCTYPE html><html><head>'
+                        '<meta http-equiv="refresh" content="0; url=./' + target + '"/>'
+                        '<title>Redirecting...</title>'
+                        '</head><body>'
+                        '<a href="./' + target + '">Click here if not redirected</a>'
+                        '</body></html>')
+            print('Redirect created: ' + index_path + ' -> ' + target)
+
 # ── step 1: root index.html ────────────────────────────
 
-root_folders = sorted(
-    [d for d in os.listdir('.') if os.path.isdir(d) and re.match(r'^assignment-\d+$', d)],
-    key=sort_key
-)
+root_folders = sorted(all_assignment_folders, key=sort_key)
 print('Folders found: ' + str(root_folders))
 
 root_cards = []
 for folder in root_folders:
     num = re.search(r'\d+', folder).group()
-    subs = [s for s in os.listdir(folder) if os.path.isdir(os.path.join(folder, s)) and os.path.exists(os.path.join(folder, s, "index.html"))]
+    subs = [s for s in os.listdir(folder) if os.path.isdir(os.path.join(folder, s)) and os.path.exists(os.path.join(folder, s, 'index.html'))]
     badge = '&#8595; ' + str(len(subs)) + ' parts' if subs else ''
     root_cards.append(make_card(folder, '#' + num.zfill(2), 'Assignment ' + num, badge))
 
