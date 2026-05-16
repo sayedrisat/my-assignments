@@ -1,7 +1,16 @@
 import os, re
 
+BOT_MARKER = '<!-- SYNC-BOT -->'
+
 def sort_key(name):
     return [int(n) for n in re.findall(r'\d+', name)]
+
+def is_bot_file(path):
+    try:
+        with open(path, 'r') as f:
+            return BOT_MARKER in f.read(50)
+    except:
+        return False
 
 def make_card(href, num_label, title, badge=''):
     return (
@@ -13,7 +22,8 @@ def make_card(href, num_label, title, badge=''):
         '      </a>'
     )
 
-ROOT_HTML = '''<!DOCTYPE html>
+ROOT_HTML = BOT_MARKER + '''
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8"/>
@@ -59,7 +69,8 @@ ROOT_HTML = '''<!DOCTYPE html>
 </body>
 </html>'''
 
-SUB_HTML = '''<!DOCTYPE html>
+SUB_HTML = BOT_MARKER + '''
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8"/>
@@ -96,33 +107,41 @@ SUB_HTML = '''<!DOCTYPE html>
 </body>
 </html>'''
 
-# ── step 0: ensure every assignment folder has index.html ──
-# If missing, create one that redirects to the first .html file found
+REDIRECT_HTML = BOT_MARKER + '''
+<!DOCTYPE html><html><head>
+<meta http-equiv="refresh" content="0; url=./{target}"/>
+<title>Redirecting...</title>
+</head><body><a href="./{target}">Click here if not redirected</a></body></html>'''
 
-all_assignment_folders = [d for d in os.listdir('.') if os.path.isdir(d) and re.match(r'^assignment-\d+$', d)]
+all_folders = sorted(
+    [d for d in os.listdir('.') if os.path.isdir(d) and re.match(r'^assignment-\d+$', d)],
+    key=sort_key
+)
+print('Folders found: ' + str(all_folders))
 
-for folder in all_assignment_folders:
+# ── step 0: fix any folder missing index.html ──────────
+# Only creates/overwrites if: no index.html exists, OR the existing one is bot-created
+
+for folder in all_folders:
     index_path = os.path.join(folder, 'index.html')
-    if not os.path.exists(index_path):
-        html_files = [f for f in os.listdir(folder) if f.endswith('.html') and f != 'index.html']
-        if html_files:
-            target = html_files[0]
-            with open(index_path, 'w') as f:
-                f.write('<!DOCTYPE html><html><head>'
-                        '<meta http-equiv="refresh" content="0; url=./' + target + '"/>'
-                        '<title>Redirecting...</title>'
-                        '</head><body>'
-                        '<a href="./' + target + '">Click here if not redirected</a>'
-                        '</body></html>')
-            print('Redirect created: ' + index_path + ' -> ' + target)
+    if os.path.exists(index_path) and not is_bot_file(index_path):
+        print('Protected (user file): ' + index_path)
+        continue
+    html_files = [f for f in os.listdir(folder) if f.endswith('.html') and f != 'index.html']
+    if html_files:
+        target = html_files[0]
+        with open(index_path, 'w') as f:
+            f.write(REDIRECT_HTML.format(target=target))
+        print('Redirect: ' + index_path + ' -> ' + target)
+    elif os.path.exists(index_path) and is_bot_file(index_path):
+        # Bot created a stale parts page but there's nothing left — remove it
+        os.remove(index_path)
+        print('Removed stale bot file: ' + index_path)
 
-# ── step 1: root index.html ────────────────────────────
-
-root_folders = sorted(all_assignment_folders, key=sort_key)
-print('Folders found: ' + str(root_folders))
+# ── step 1: root index.html (always bot-managed) ───────
 
 root_cards = []
-for folder in root_folders:
+for folder in all_folders:
     num = re.search(r'\d+', folder).group()
     subs = [s for s in os.listdir(folder) if os.path.isdir(os.path.join(folder, s)) and os.path.exists(os.path.join(folder, s, 'index.html'))]
     badge = '&#8595; ' + str(len(subs)) + ' parts' if subs else ''
@@ -130,11 +149,11 @@ for folder in root_folders:
 
 with open('index.html', 'w') as f:
     f.write(ROOT_HTML.format(cards='\n'.join(root_cards)))
-print('Written: index.html (' + str(len(root_folders)) + ' cards)')
+print('Written: index.html (' + str(len(all_folders)) + ' cards)')
 
-# ── step 2: sub-folder pages ───────────────────────────
+# ── step 2: sub-folder pages (only bot-marked or new) ──
 
-for folder in root_folders:
+for folder in all_folders:
     subs = sorted(
         [s for s in os.listdir(folder) if os.path.isdir(os.path.join(folder, s)) and os.path.exists(os.path.join(folder, s, 'index.html'))],
         key=sort_key
@@ -142,8 +161,11 @@ for folder in root_folders:
     if not subs:
         continue
     num = re.search(r'\d+', folder).group()
-    sub_cards = [make_card(s, 'Part ' + str(i), s.replace('-', ' ').title()) for i, s in enumerate(subs, 1)]
     sub_index = os.path.join(folder, 'index.html')
+    if os.path.exists(sub_index) and not is_bot_file(sub_index):
+        print('Protected (user file): ' + sub_index)
+        continue
+    sub_cards = [make_card(s, 'Part ' + str(i), s.replace('-', ' ').title()) for i, s in enumerate(subs, 1)]
     with open(sub_index, 'w') as f:
         f.write(SUB_HTML.format(num=num.zfill(2), cards='\n'.join(sub_cards)))
-    print('Written: ' + sub_index + ' (' + str(len(subs)) + ' parts)')
+    print('Written sub-page: ' + sub_index)
