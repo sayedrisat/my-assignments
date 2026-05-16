@@ -1,6 +1,7 @@
 import os, re
 
 BOT_MARKER = '<!-- SYNC-BOT -->'
+IGNORED_SUBDIRS = {'assets', 'images', 'img', 'css', 'js', 'fonts', 'media', 'static'}
 
 def sort_key(name):
     return [int(n) for n in re.findall(r'\d+', name)]
@@ -143,7 +144,7 @@ for folder in all_folders:
 root_cards = []
 for folder in all_folders:
     num = re.search(r'\d+', folder).group()
-    subs = [s for s in os.listdir(folder) if os.path.isdir(os.path.join(folder, s)) and os.path.exists(os.path.join(folder, s, 'index.html'))]
+    subs = [s for s in os.listdir(folder) if s.lower() not in IGNORED_SUBDIRS and os.path.isdir(os.path.join(folder, s)) and os.path.exists(os.path.join(folder, s, 'index.html'))]
     badge = '&#8595; ' + str(len(subs)) + ' parts' if subs else ''
     root_cards.append(make_card(folder, '#' + num.zfill(2), 'Assignment ' + num, badge))
 
@@ -155,7 +156,7 @@ print('Written: index.html (' + str(len(all_folders)) + ' cards)')
 
 for folder in all_folders:
     subs = sorted(
-        [s for s in os.listdir(folder) if os.path.isdir(os.path.join(folder, s)) and os.path.exists(os.path.join(folder, s, 'index.html'))],
+        [s for s in os.listdir(folder) if s.lower() not in IGNORED_SUBDIRS and os.path.isdir(os.path.join(folder, s)) and os.path.exists(os.path.join(folder, s, 'index.html'))],
         key=sort_key
     )
     if not subs:

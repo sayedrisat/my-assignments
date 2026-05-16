@@ -1,40 +1,147 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Assignment 04</title>
-  <link rel="stylesheet" href="../style.css"/>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@700;800&display=swap" rel="stylesheet"/>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Butusic Exhibition</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="bg-grid"></div>
-  <header>
-    <div class="header-inner">
-      <a href="../" class="back-link">&#8592; All Assignments</a>
-      <div class="badge">Assignment 04</div>
-      <h1>Assignment 04</h1>
-      <p class="subtitle">Select a part to open</p>
-    </div>
-  </header>
-  <main>
-    <div class="grid" id="assignments">
-      <a href="./assets/" class="card">
-        <span class="num">Part 1</span>
-        <span class="title">Assets</span>
-        <span class="arrow">&#8599;</span>
+  <main class="poster-grid">
+    <section class="card portrait-card portrait-yellow" aria-label="Illustration portrait with yellow jacket">
+      <img src="assets/portrait-yellow-jacket.png" alt="3D illustrated character wearing a yellow jacket">
+    </section>
+
+    <section class="card cases-card" aria-label="More cases circle graphic">
+      <img src="assets/more-cases-circle.png" alt="Circular more cases artwork">
+    </section>
+
+    <nav class="card side-menu" aria-label="Main navigation">
+      <a class="menu-link" href="#">
+        <i data-lucide="grid-2x2"></i>
+        <span>Categories</span>
       </a>
-    </div>
+      <a class="menu-link" href="#">
+        <i data-lucide="credit-card"></i>
+        <span>Payment</span>
+      </a>
+      <a class="menu-link" href="#">
+        <i data-lucide="user-round"></i>
+        <span>Authors</span>
+      </a>
+      <a class="menu-link is-active" href="#">
+        <i data-lucide="gavel"></i>
+        <span>Auction</span>
+      </a>
+      <a class="menu-link" href="#">
+        <i data-lucide="trending-up"></i>
+        <span>Sales</span>
+      </a>
+      <a class="menu-link" href="#">
+        <i data-lucide="star"></i>
+        <span>Reviews</span>
+      </a>
+
+      <span class="menu-line" aria-hidden="true"></span>
+
+      <a class="menu-link" href="#">
+        <i data-lucide="mail"></i>
+        <span>Contacts</span>
+      </a>
+    </nav>
+
+    <section class="card perks-card">
+      <div class="perk">
+        <i data-lucide="smile"></i>
+        <p>Only exclusive illustrations</p>
+      </div>
+      <span class="perk-divider" aria-hidden="true"></span>
+      <div class="perk">
+        <i data-lucide="package-open"></i>
+        <p>We do not sell works on stock</p>
+      </div>
+    </section>
+
+    <section class="card title-card">
+      <div>
+        <h1>Butusic</h1>
+        <p class="purple-label">Illustrations<br>Exhibition</p>
+      </div>
+
+      <span class="title-line" aria-hidden="true"></span>
+
+      <div class="payment-note">
+        <span class="coin-icon">
+          <i data-lucide="bitcoin"></i>
+        </span>
+        <p>We accept more than just bitcoins</p>
+      </div>
+
+      <img class="barcode" src="assets/ticket-barcode.png" alt="Ticket barcode">
+    </section>
+
+    <section class="card venue-card">
+      <div class="location-row">
+        <span class="pin-icon">
+          <i data-lucide="map-pin"></i>
+        </span>
+        <p>1217 PURRWEB<br>STREET, LA</p>
+      </div>
+
+      <h2>First exhibition of illustrations offline</h2>
+      <p class="muted-link">Butusic.com/exhibition</p>
+    </section>
+
+    <section class="card portrait-card portrait-purple" aria-label="Illustration portrait with purple sweater">
+      <img src="assets/portrait-purple-sweater.png" alt="3D illustrated character wearing a purple sweater">
+    </section>
+
+    <section class="card awards-card" aria-label="Award badges">
+      <span class="medal"></span>
+      <span class="medal"></span>
+      <span class="medal"></span>
+      <span class="medal"></span>
+    </section>
+
+    <section class="card app-card">
+      <img class="qr-code" src="assets/app-qr-code.png" alt="App store QR code">
+      <div class="app-copy">
+        <div class="app-heading">
+          <h2>Appstore</h2>
+          <i data-lucide="arrow-up-right"></i>
+        </div>
+        <p>Download the app and get 10% off your first purchase</p>
+      </div>
+    </section>
+
+    <section class="card rating-card">
+      <div class="rating-copy">
+        <h2>Only the best authors</h2>
+        <p>184 guys with a unique vision</p>
+      </div>
+
+      <div class="rating-score">
+        <p class="score">4.97</p>
+        <div class="stars" aria-label="4.97 out of 5 stars">
+          <i class="filled" data-lucide="star"></i>
+          <i class="filled" data-lucide="star"></i>
+          <i class="filled" data-lucide="star"></i>
+          <i class="filled" data-lucide="star"></i>
+          <i class="outline" data-lucide="star"></i>
+        </div>
+        <a class="review-button" href="#">
+          <span>Best reviews</span>
+          <i data-lucide="chevron-right"></i>
+        </a>
+      </div>
+    </section>
   </main>
-  <footer>
-    <span>Auto-synced with GitHub</span>
-    <span class="dot">&middot;</span>
-    <span id="count">0 parts</span>
-  </footer>
+
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
   <script>
-    var c = document.querySelectorAll('.card');
-    document.getElementById('count').textContent = c.length + ' part' + (c.length !== 1 ? 's' : '');
-    c.forEach(function(el, i) { el.style.animationDelay = (i * 80) + 'ms'; });
+    if (window.lucide) {
+      lucide.createIcons();
+    }
   </script>
 </body>
 </html>
