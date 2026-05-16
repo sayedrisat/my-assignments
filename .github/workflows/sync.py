@@ -111,7 +111,7 @@ print('Folders found: ' + str(root_folders))
 root_cards = []
 for folder in root_folders:
     num = re.search(r'\d+', folder).group()
-    subs = [s for s in os.listdir(folder) if os.path.isdir(os.path.join(folder, s))]
+    subs = [s for s in os.listdir(folder) if os.path.isdir(os.path.join(folder, s)) and os.path.exists(os.path.join(folder, s, "index.html"))]
     badge = '&#8595; ' + str(len(subs)) + ' parts' if subs else ''
     root_cards.append(make_card(folder, '#' + num.zfill(2), 'Assignment ' + num, badge))
 
@@ -123,7 +123,7 @@ print('Written: index.html (' + str(len(root_folders)) + ' cards)')
 
 for folder in root_folders:
     subs = sorted(
-        [s for s in os.listdir(folder) if os.path.isdir(os.path.join(folder, s))],
+        [s for s in os.listdir(folder) if os.path.isdir(os.path.join(folder, s)) and os.path.exists(os.path.join(folder, s, 'index.html'))],
         key=sort_key
     )
     if not subs:
