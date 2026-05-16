@@ -1,61 +1,70 @@
+<!-- SYNC-BOT -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Assignments</title>
-  <link rel="stylesheet" href="style.css" />
-  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@700;800&display=swap" rel="stylesheet"/>
 </head>
 <body>
-
   <div class="bg-grid"></div>
-
   <header>
     <div class="header-inner">
       <div class="badge">Portfolio</div>
       <h1>Assignments</h1>
-      <p class="subtitle">A collection of coursework & submitted work</p>
+      <p class="subtitle">A collection of coursework &amp; submitted work</p>
     </div>
   </header>
-
   <main>
     <div class="grid" id="assignments">
-      <!-- ASSIGNMENTS_START -->
-      <!-- ASSIGNMENTS_END -->
+      <a href="./assignment-1/" class="card">
+        <span class="num">#01</span>
+        <span class="title">Assignment 1</span>
+        <span class="arrow">&#8599;</span>
+      </a>
+      <a href="./assignment-2/" class="card">
+        <span class="num">#02</span>
+        <span class="title">Assignment 2</span>
+        <span class="arrow">&#8599;</span>
+      </a>
+      <a href="./assignment-3/" class="card">
+        <span class="num">#03</span>
+        <span class="title">Assignment 3</span>
+        <span class="arrow">&#8599;</span>
+      </a>
+      <a href="./assignment-4/" class="card">
+        <span class="num">#04</span>
+        <span class="title">Assignment 4</span>
+        <span class="arrow">&#8599;</span>
+      </a>
+      <a href="./assignment-5/" class="card">
+        <span class="num">#05</span>
+        <span class="title">Assignment 5</span>
+        <span class="arrow">&#8599;</span>
+      </a>
     </div>
-
-    <div class="empty-state" id="empty-state" style="display:none;">
-      <span class="empty-icon">📂</span>
+    <div class="empty-state" id="empty-state">
+      <span class="empty-icon">&#128193;</span>
       <p>No assignments yet. Add a folder like <code>assignment-1/</code> and push.</p>
     </div>
   </main>
-
   <footer>
     <span>Auto-synced with GitHub</span>
-    <span class="dot">·</span>
+    <span class="dot">&middot;</span>
     <span id="count">0 assignments</span>
   </footer>
-
   <script>
-    // Count cards and show empty state if needed
-    const cards = document.querySelectorAll('.card');
-    const countEl = document.getElementById('count');
-    const emptyEl = document.getElementById('empty-state');
-    const grid = document.getElementById('assignments');
-
-    countEl.textContent = `${cards.length} assignment${cards.length !== 1 ? 's' : ''}`;
-
+    var cards = document.querySelectorAll('.card');
+    document.getElementById('count').textContent = cards.length + ' assignment' + (cards.length !== 1 ? 's' : '');
     if (cards.length === 0) {
-      grid.style.display = 'none';
-      emptyEl.style.display = 'flex';
+      document.getElementById('assignments').style.display = 'none';
+      document.getElementById('empty-state').style.display = 'flex';
+    } else {
+      document.getElementById('empty-state').style.display = 'none';
     }
-
-    // Stagger card reveal on load
-    cards.forEach((card, i) => {
-      card.style.animationDelay = `${i * 80}ms`;
-    });
+    cards.forEach(function(c, i) { c.style.animationDelay = (i * 80) + 'ms'; });
   </script>
-
 </body>
 </html>
