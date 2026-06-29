@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FinTrack Pro | Personal Finance Tracker</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="auth-section" class="auth-shell">
+    <section id="login-card" class="auth-card" aria-labelledby="login-title">
+      <p class="eyebrow">Welcome Back</p>
+      <h1 id="login-title">Login to FinTrack Pro</h1>
+      <p>Use the username and password you registered in this browser.</p>
+      <form id="login-form" class="form-grid" novalidate>
+        <div class="field full">
+          <label for="login-username">Username</label>
+          <input id="login-username" type="text" autocomplete="username" placeholder="Username">
+        </div>
+        <div class="field full">
+          <label for="login-password">Password</label>
+          <input id="login-password" type="password" autocomplete="current-password" placeholder="Password">
+        </div>
+        <p id="login-message" class="message error field full" role="alert"></p>
+        <button class="primary-button field full" type="submit">Login</button>
+      </form>
+      <p class="auth-switch">Don't have an account? <button id="show-register-button" class="link-button" type="button">Register here</button></p>
+    </section>
+
+    <section id="register-card" class="auth-card" aria-labelledby="register-title" hidden>
+      <p class="eyebrow">Create Account</p>
+      <h1 id="register-title">Join FinTrack Pro</h1>
+      <p>Register once and your user will be remembered in localStorage.</p>
+      <form id="register-form" class="form-grid" novalidate>
+        <div class="field full">
+          <label for="register-username">Choose a Username</label>
+          <input id="register-username" type="text" autocomplete="username" placeholder="Username">
+        </div>
+        <div class="field full">
+          <label for="register-password">Password</label>
+          <input id="register-password" type="password" autocomplete="new-password" placeholder="Password">
+        </div>
+        <p id="register-message" class="message error field full" role="alert"></p>
+        <button class="primary-button field full" type="submit">Register</button>
+      </form>
+      <p class="auth-switch">Already have an account? <button id="show-login-button" class="link-button" type="button">Login here</button></p>
+    </section>
+  </div>
+
+  <div id="app-section" hidden>
+    <aside class="sidebar">
+      <div class="brand" aria-label="FinTrack Pro">
+        <span class="brand-mark" aria-hidden="true">FP</span>
+        <span>
+          <strong>FinTrack Pro</strong>
+          <small>Enterprise Finance</small>
+        </span>
+      </div>
+
+      <nav class="side-nav" aria-label="Primary navigation">
+        <button id="dashboard-button" class="nav-link active" type="button">
+          <span class="nav-icon" aria-hidden="true">D</span>
+          Dashboard
+        </button>
+        <button id="settings-button" class="nav-link" type="button">
+          <span class="nav-icon" aria-hidden="true">S</span>
+          Settings
+        </button>
+      </nav>
+
+      <button id="add-transaction-button" class="sidebar-add-button" type="button">
+        <span aria-hidden="true">+</span>
+        Add Transaction
+      </button>
+    </aside>
+
+    <div class="workspace">
+      <header class="topbar">
+        <div></div>
+        <div class="topbar-actions">
+          <span id="active-username" class="active-user">Guest</span>
+          <button id="logout-button" class="logout-button" type="button">
+            <span aria-hidden="true">-></span>
+            Logout
+          </button>
+        </div>
+      </header>
+
+      <main class="main-shell">
+        <section id="dashboard-page" class="page" aria-labelledby="dashboard-title">
+          <div class="section-header">
+            <div>
+              <h1 id="dashboard-title">Financial Overview</h1>
+              <p id="welcome-text">Real-time tracking application</p>
+            </div>
+          </div>
+
+          <div class="stats-grid" aria-label="Finance summary">
+            <article class="stat-card">
+              <span class="stat-icon balance-icon" aria-hidden="true">$</span>
+              <p class="stat-label">Current Balance</p>
+              <p id="balance-amount" class="stat-value balance-text">$0.00</p>
+            </article>
+            <article class="stat-card">
+              <span class="stat-icon income-icon" aria-hidden="true">+</span>
+              <p class="stat-label">Total Income</p>
+              <p id="income-amount" class="stat-value income-text">$0.00</p>
+            </article>
+            <article class="stat-card">
+              <span class="stat-icon expense-icon" aria-hidden="true">-</span>
+              <p class="stat-label">Total Expense</p>
+              <p id="expense-amount" class="stat-value expense-text">$0.00</p>
+            </article>
+            <article class="stat-card">
+              <span class="stat-icon count-icon" aria-hidden="true">#</span>
+              <p class="stat-label">Total Transactions</p>
+              <p id="transaction-count" class="stat-value">0</p>
+            </article>
+          </div>
+
+          <div class="dashboard-grid">
+            <section class="panel chart-panel" aria-labelledby="chart-title">
+              <div class="panel-header">
+                <div>
+                  <h2 id="chart-title">Cash Flow Analysis</h2>
+                </div>
+              </div>
+              <div class="chart-wrap">
+                <canvas id="cash-flow-chart" aria-label="Cash flow bar chart" role="img"></canvas>
+                <div id="chart-message" class="chart-status" hidden>Chart could not load.</div>
+              </div>
+            </section>
+
+            <aside class="panel preferences-panel" aria-labelledby="preferences-title">
+              <div class="panel-header">
+                <div>
+                  <h2 id="preferences-title">Preferences</h2>
+                </div>
+              </div>
+
+              <div class="preference-row">
+                <strong>Dark Mode</strong>
+                <label class="switch" aria-label="Toggle dark mode">
+                  <input id="dark-mode-toggle" type="checkbox">
+                  <span class="slider"></span>
+                </label>
+              </div>
+
+              <button id="reset-button" class="reset-button" type="button">Reset All Data</button>
+            </aside>
+          </div>
+
+          <section class="panel transactions-panel" aria-labelledby="table-title">
+            <div class="panel-header">
+              <div>
+                <h2 id="table-title">All Transactions</h2>
+                <p id="table-summary">Showing all transactions.</p>
+              </div>
+            </div>
+
+            <div class="transaction-tools">
+              <label class="search-field" for="transaction-search">
+                <span aria-hidden="true">Search</span>
+                <input id="transaction-search" type="search" placeholder="Search transactions...">
+              </label>
+
+              <select id="transaction-filter" aria-label="Filter transactions">
+                <option value="all">All Types</option>
+                <option value="income">Income Only</option>
+                <option value="expense">Expense Only</option>
+              </select>
+            </div>
+
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th scope="col">Date</th>
+                    <th scope="col">Description</th>
+                    <th scope="col">Category</th>
+                    <th scope="col">Amount</th>
+                    <th scope="col">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="transaction-table-body"></tbody>
+              </table>
+            </div>
+            <div id="empty-message" class="empty-state" hidden>No transactions match this view.</div>
+          </section>
+        </section>
+
+        <section id="settings-page" class="page" aria-labelledby="settings-title" hidden>
+          <div class="section-header">
+            <div>
+              <h1 id="settings-title">Settings</h1>
+              <p>Update your profile name and currency preference.</p>
+            </div>
+          </div>
+
+          <section class="panel profile-panel" aria-labelledby="profile-title">
+            <div class="panel-header">
+              <div>
+                <h2 id="profile-title">Profile Settings</h2>
+                <p>Currency changes update every amount immediately.</p>
+              </div>
+            </div>
+            <form id="profile-form" class="form-grid">
+              <div class="field">
+                <label for="display-name">Display name</label>
+                <input id="display-name" type="text" autocomplete="name" placeholder="Guest">
+              </div>
+              <div class="field">
+                <label for="currency-select">Currency</label>
+                <select id="currency-select">
+                  <option value="USD">USD - Dollar</option>
+                  <option value="EUR">EUR - Euro</option>
+                  <option value="GBP">GBP - Pound</option>
+                  <option value="INR">INR - Rupee</option>
+                  <option value="JPY">JPY - Yen</option>
+                </select>
+              </div>
+              <div class="settings-actions field full">
+                <button class="primary-button" type="submit">Save Profile</button>
+                <p id="profile-message" class="message" role="status"></p>
+              </div>
+            </form>
+          </section>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <div id="transaction-modal" class="modal-overlay" hidden>
+    <section class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+      <div class="modal-header">
+        <h2 id="modal-title">Add Transaction</h2>
+        <button id="close-modal-button" class="close-button" type="button" aria-label="Close modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="transaction-form" class="form-grid" novalidate>
+          <div class="field">
+            <label for="transaction-type">Type</label>
+            <select id="transaction-type" required>
+              <option value="">Choose type</option>
+              <option value="income">Income</option>
+              <option value="expense">Expense</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="transaction-amount">Amount</label>
+            <input id="transaction-amount" type="number" min="0.01" step="0.01" placeholder="0.00" required>
+          </div>
+          <div class="field full">
+            <label for="transaction-description">Description</label>
+            <input id="transaction-description" type="text" maxlength="80" placeholder="Salary, groceries, transport" required>
+          </div>
+          <div class="field">
+            <label for="transaction-date">Date</label>
+            <input id="transaction-date" type="date" required>
+          </div>
+          <div class="field">
+            <label for="transaction-category">Category</label>
+            <select id="transaction-category" required>
+              <option value="">Choose category</option>
+              <option>Food &amp; Dining</option>
+              <option>Shopping</option>
+              <option>Recharge &amp; Bills</option>
+              <option>Petrol &amp; Auto</option>
+              <option>Utilities</option>
+              <option>Salary</option>
+              <option>Entertainment</option>
+              <option>Other</option>
+            </select>
+          </div>
+          <div class="field full">
+            <p id="form-message" class="message error" role="alert"></p>
+          </div>
+          <div class="modal-actions field full">
+            <button class="primary-button" type="submit">Save Transaction</button>
+            <button id="cancel-modal-button" class="ghost-button" type="button">Cancel</button>
+          </div>
+        </form>
+      </div>
+    </section>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
